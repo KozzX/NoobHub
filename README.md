@@ -22,6 +22,11 @@ Lua code may serve as an example of how LuaSocket library works.
 
 How to use it
 ------------
+CREATE SERVER ON UBUNTU 16.04
+```bash
+        $ cd ~
+        $ curl -sL https://raw.githubusercontent.com/KozzX/NoobHub/master/install-noob.sh -o install-noob.sh 
+```
 
 START SERVER
 ```bash
