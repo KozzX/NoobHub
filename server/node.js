@@ -80,7 +80,7 @@ server.on('connection', function (socket) {
         jsonObj['numplayers'] = subscribers.length;
         jsonObj['channel'] = socket.channel;
         json = JSON.stringify(jsonObj);
-        _log('Number of subscribers on ' + socket.channel + ': ' + subscribers.length + ' ' + json)
+        _log('KozzX Number of subscribers on ' + socket.channel + ': ' + subscribers.length + ' ' + json)
         for (var i = 0, l = subscribers.length; i < l; i++) {
           sockets[socket.channel][ subscribers[i] ].isConnected && sockets[socket.channel][ subscribers[i] ].write('__JSON__START__' + json + '__JSON__END__')
         } // writing this message to all sockets with the same channel
