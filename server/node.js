@@ -20,7 +20,7 @@ var sockets = {}  // this is where we store all current client socket connection
 var cfg = {
   port: 1337,
   buffer_size: 1024 * 16, // buffer allocated per each socket client
-  verbose: false // set to true to capture lots of debug info
+  verbose: true // set to true to capture lots of debug info
 }
 var _log = function () {
   if (cfg.verbose) console.log.apply(console, arguments)
@@ -72,10 +72,15 @@ server.on('connection', function (socket) {
     do {  // this is for a case when several messages arrived in buffer
       if ((start = str.indexOf('__JSON__START__')) !== -1 && (end = str.indexOf('__JSON__END__')) !== -1) {
         var json = str.substr(start + 15, end - (start + 15))
-        _log('Client posts json:  ' + json)
+        //_log('Client posts json:  ' + json)
         str = str.substr(end + 13)  // cut the message and remove the precedant part of the buffer since it can't be processed
         socket.buffer.len = socket.buffer.write(str, 0)
         var subscribers = Object.keys(sockets[socket.channel])
+        var jsonObj = JSON.parse(json);
+        jsonObj['numplayers'] = subscribers.length;
+        jsonObj['channel'] = socket.channel;
+        json = JSON.stringify(jsonObj);
+        _log('Number of subscribers on ' + socket.channel + ': ' + subscribers.length + ' ' + json)
         for (var i = 0, l = subscribers.length; i < l; i++) {
           sockets[socket.channel][ subscribers[i] ].isConnected && sockets[socket.channel][ subscribers[i] ].write('__JSON__START__' + json + '__JSON__END__')
         } // writing this message to all sockets with the same channel
