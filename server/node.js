@@ -79,21 +79,26 @@ server.on('connection', function (socket) {
         var jsonObj = JSON.parse(json);
         jsonObj['numplayers'] = subscribers.length;
         jsonObj['channel'] = socket.channel;
+        jsonObj['noobId'] = socket.connectionId;
         json = JSON.stringify(jsonObj);
-        _log('KozzX Number of subscribers on ' + socket.channel + ': ' + subscribers.length + ' ' + json)
+        _log('KozzX Number of subscribers on ' + socket.channel + ': ' + jsonObj['id'] + subscribers.length + ' ' + json)
         for (var i = 0, l = subscribers.length; i < l; i++) {
           sockets[socket.channel][ subscribers[i] ].isConnected && sockets[socket.channel][ subscribers[i] ].write('__JSON__START__' + json + '__JSON__END__')
         } // writing this message to all sockets with the same channel
         timeToExit = false
       } else { timeToExit = true } // if no json data found in buffer - then it is time to exit this loop
     } while (!timeToExit)
-  }) // end of  socket.on 'data'
+  }) // end of  socket.on 'data'R
 
   socket.on('error', function () { return _destroySocket(socket) })
   socket.on('close', function () { return _destroySocket(socket) })
 }) //  end of server.on 'connection'
 
 var _destroySocket = function (socket) {
+	var jsonObj;
+	jsonObj['noobId'] = socket.connectionId;
+  var json = JSON.stringify(jsonObj);
+	sockets[socket.channel][ subscribers[i] ].isConnected && sockets[socket.channel][ subscribers[i] ].write('__JSON__START__' + json + '__JSON__END__')
   if (!socket.channel || !sockets[socket.channel] || !sockets[socket.channel][socket.connectionId]) return
   sockets[socket.channel][socket.connectionId].isConnected = false
   sockets[socket.channel][socket.connectionId].destroy()
