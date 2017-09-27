@@ -81,7 +81,7 @@ server.on('connection', function (socket) {
         jsonObj['numplayers'] = subscribers.length;
         jsonObj['channel'] = socket.channel;
         jsonObj['noobid'] = socket.connectionId;
-        jsonObs['lastUpdate']= milliseconds;
+        jsonObj['lastUpdate'] = milliseconds;
         json = JSON.stringify(jsonObj);
         _log('KozzX Number of subscribers on ' + socket.channel + ': ' + jsonObj['id'] + subscribers.length + ' ' + json)
         for (var i = 0, l = subscribers.length; i < l; i++) {
