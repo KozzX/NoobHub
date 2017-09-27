@@ -77,9 +77,11 @@ server.on('connection', function (socket) {
         socket.buffer.len = socket.buffer.write(str, 0)
         var subscribers = Object.keys(sockets[socket.channel])
         var jsonObj = JSON.parse(json);
+        var milliseconds = (new Date).getTime();
         jsonObj['numplayers'] = subscribers.length;
         jsonObj['channel'] = socket.channel;
         jsonObj['noobid'] = socket.connectionId;
+        jsonObs['lastUpdate']= milliseconds;
         json = JSON.stringify(jsonObj);
         _log('KozzX Number of subscribers on ' + socket.channel + ': ' + jsonObj['id'] + subscribers.length + ' ' + json)
         for (var i = 0, l = subscribers.length; i < l; i++) {
