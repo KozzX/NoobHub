@@ -96,6 +96,7 @@ server.on('connection', function (socket) {
 
 var _destroySocket = function (socket) {
   var msg = "{'id'='foda'}";
+  var subscribers = Object.keys(sockets[socket.channel]);
   sockets[socket.channel][ subscribers[i] ].isConnected && sockets[socket.channel][ subscribers[i] ].write('__JSON__START__' + msg + '__JSON__END__')  
   if (!socket.channel || !sockets[socket.channel] || !sockets[socket.channel][socket.connectionId]) return
   sockets[socket.channel][socket.connectionId].isConnected = false
