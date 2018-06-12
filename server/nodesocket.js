@@ -28,10 +28,12 @@ server.on('connection', function(user){
 				delete users["lobby"][lobbyUsers[0]];
 				delete users["lobby"][lobbyUsers[1]];
 
+				users[user.room][lobbyUsers[0]].life = 50;
+				users[user.room][lobbyUsers[1]].life = 50;
 				users[user.room][lobbyUsers[0]].write('{"action":"gameinit","id":"' + lobbyUsers[0] + '","room":"' + user.room + '"}\n');
 				users[user.room][lobbyUsers[1]].write('{"action":"gameinit","id":"' + lobbyUsers[1] + '","room":"' + user.room + '"}\n');
 
-				console.log("Criar Sala",lobbyUsers);				
+				console.log("Criar Sala",users);				
 			};
 		};
 		if (message.action == 'HIT') {
@@ -67,6 +69,11 @@ server.on('listening', function() {
 	console.log("----------Port: " + server.address().port + "-----------------------------");
 	console.log("-------------------------------------------------");
 	console.log("-------------------------------------------------");
+	console.log("#...#...###...####...#####");
+	console.log("##..#..#...#..#...#..#....");
+	console.log("#.#.#..#...#..#...#..###..");
+	console.log("#..##..#...#..#...#..#....");
+	console.log("#...#...###...####...#####");
 })
 server.listen(1902, '::')
 
