@@ -1,5 +1,12 @@
 var server = require('net').createServer()
 var users = {}
+var cfg = {
+  port: 1902,
+  verbose: false // set to true to capture lots of debug info
+}
+var _log = function () {
+  if (cfg.verbose) console.log.apply(console, arguments)
+}
 
 server.on('connection', function(user){
 	user.setNoDelay(true);
@@ -7,14 +14,14 @@ server.on('connection', function(user){
 	user.connectionId = "id" + user.remoteAddress  + '-' + user.remotePort;
 	user.write('{"action":"connect","id":"'+user.connectionId+'"}\n')
 
-	console.log("----------User " + user.connectionId + " connected-----------");
+	_log("----------User " + user.connectionId + " connected-----------");
 
 	user.on('data', function (dataRaw){
 		var pos = dataRaw.toString().indexOf("}");
-		console.log("RAW",dataRaw.toString().slice(0,pos+1));
+		_log("RAW",dataRaw.toString().slice(0,pos+1));
 		var message = JSON.parse(dataRaw.toString().slice(0,pos+1));
 		if (message.action == 'MATCHMAKE') {
-			console.log("MATCHMAKE");
+			_log("MATCHMAKE");
 			user.room = "lobby";
 			users[user.room] = users[user.room] || {};
 			users[user.room][user.connectionId] = user;
@@ -33,11 +40,11 @@ server.on('connection', function(user){
 				users[user.room][lobbyUsers[0]].write('{"action":"gameinit","id":"' + lobbyUsers[0] + '","room":"' + user.room + '"}\n');
 				users[user.room][lobbyUsers[1]].write('{"action":"gameinit","id":"' + lobbyUsers[1] + '","room":"' + user.room + '"}\n');
 
-				console.log("Criar Sala",users);				
+				_log("Criar Sala",users);				
 			};
 		};
 		if (message.action == 'HIT') {
-			console.log("HIT");
+			_log("HIT");
 			var hit = message.hit;
 			var gameUsers = Object.keys(users[message.room])
 			for (var i = 0; i < gameUsers.length; i++) {
@@ -49,7 +56,7 @@ server.on('connection', function(user){
 
 				message['life'] = users[message.room][gameUsers[i]].life;
 
-				console.log("LIFES",message.id, message.life);
+				_log("LIFES",message.id, message.life);
 
 				users[message.room][gameUsers[i]].write(JSON.stringify(message) + "\n");
 			};
@@ -64,45 +71,52 @@ var _destroySocket = function (user) {
   users[user.room][user.connectionId].isConnected = false
   users[user.room][user.connectionId].destroy()
   delete users[user.room][user.connectionId]
-  console.log(user.connectionId + ' has been disconnected from channel ' + user.room)
+  _log(user.connectionId + ' has been disconnected from channel ' + user.room)
 
   if (Object.keys(users[user.room]).length === 0) {
     delete users[user.room]
-    console.log('empty channel wasted')
+    _log('empty channel wasted')
   }
 }
 
 server.on('listening', function() {
-	console.log("-------------------------------------------------");
-	console.log("-------------------------------------------------");
-	console.log("----------Socket Multiplayer Server ON-----------");
-	console.log("----------Port: " + server.address().port + "-----------------------------");
-	console.log("-------------------------------------------------");
-	console.log("-------------------------------------------------");
-	console.log("#...#...###...####...#####");
-	console.log("##..#..#...#..#...#..#....");
-	console.log("#.#.#..#...#..#...#..###..");
-	console.log("#..##..#...#..#...#..#....");
-	console.log("#...#...###...####...#####");
+	console.log("------------------------------------------------------------------");
+	console.log("------------------------------------------------------------------");
+	console.log("-------------------Socket Multiplayer Server ON-------------------");
+	console.log("-------------------Port: " + server.address().port + "-------------------------------------");
+	console.log("------------------------------------------------------------------");
+	console.log("------------------------------------------------------------------");
+	console.log("--------------------#...#...###...####...#####--------------------");
+	console.log("--------------------##..#..#...#..#...#..#....--------------------");
+	console.log("--------------------#.#.#..#...#..#...#..###..--------------------");
+	console.log("--------------------#..##..#...#..#...#..#....--------------------");
+	console.log("--------------------#...#...###...####...#####--------------------");
+	console.log("------------------------------------------------------------------");
+	console.log("------------------------------------------------------------------");
 })
 server.listen(1902, '::')
 
 
-/*user.channel = 'lobby';
+function monitRooms() {
+	console.log("------------------------------------------------------------------");
+	console.log("-----------------------Lista de users-----------------------------");
+	console.log("----" + new Date().toString() + "----");
+	console.log("------------------------------------------------------------------");
 
-for (var i = 0; i < 10; i++) {
-	users[user.channel] = users[user.channel] || {}
-	users[user.channel][ i ] = "socket"+i;
-
-}
-
-user.channel = 'lobby2';
-
-for (var i = 10; i < 20; i++) {
-	users[user.channel] = users[user.channel] || {}
-	users[user.channel][ i ] = "socket"+i;
-
-}
+	var salas = (Object.keys(users));
 	
+	for (var i = 0; i < salas.length; i++) {
+		console.log("Sala:",salas[i]);
+		var usuarios = Object.keys(users[salas[i]]);
+		for (var j = 0; j < usuarios.length; j++) {
+			console.log("|_ Usuário:",usuarios[j],users[salas[i]][usuarios[j]].life);
+		};
+		console.log("----------------------------");
+	};
+	console.log("------------------------------------------------------------------");
+	console.log("------------------------------------------------------------------");
+	setTimeout(monitRooms, 2000);
+	
+}
 
-console.log(users["lobby"][2]);*/
+setTimeout(monitRooms, 1000);
