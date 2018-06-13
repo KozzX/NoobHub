@@ -1,5 +1,9 @@
 var server = require('net').createServer()
 var users = {}
+process.argv.forEach(function (val, index, array) {
+  console.log(index + ': ' + val);
+});
+
 var cfg = {
   port: 1902,
   verbose: false // set to true to capture lots of debug info
@@ -35,8 +39,10 @@ server.on('connection', function(user){
 				delete users["lobby"][lobbyUsers[0]];
 				delete users["lobby"][lobbyUsers[1]];
 
-				users[user.room][lobbyUsers[0]].life = 40;
-				users[user.room][lobbyUsers[1]].life = 60;
+				users[user.room][lobbyUsers[0]].life = 50;
+				users[user.room][lobbyUsers[1]].life = 50;
+				users[user.room][lobbyUsers[0]].room = user.room;
+				users[user.room][lobbyUsers[1]].room = user.room;
 				users[user.room][lobbyUsers[0]].write('{"action":"gameinit","id":"' + lobbyUsers[0] + '","room":"' + user.room + '"}\n');
 				users[user.room][lobbyUsers[1]].write('{"action":"gameinit","id":"' + lobbyUsers[1] + '","room":"' + user.room + '"}\n');
 
@@ -71,11 +77,11 @@ var _destroySocket = function (user) {
   users[user.room][user.connectionId].isConnected = false
   users[user.room][user.connectionId].destroy()
   delete users[user.room][user.connectionId]
-  _log(user.connectionId + ' has been disconnected from channel ' + user.room)
+  console.log(user.connectionId + ' has been disconnected from channel ' + user.room)
 
   if (Object.keys(users[user.room]).length === 0) {
     delete users[user.room]
-    _log('empty channel wasted')
+    console.log('empty channel wasted ' + user.room)
   }
 }
 
