@@ -28,8 +28,8 @@ server.on('connection', function(user){
 				delete users["lobby"][lobbyUsers[0]];
 				delete users["lobby"][lobbyUsers[1]];
 
-				users[user.room][lobbyUsers[0]].life = 50;
-				users[user.room][lobbyUsers[1]].life = 50;
+				users[user.room][lobbyUsers[0]].life = 40;
+				users[user.room][lobbyUsers[1]].life = 60;
 				users[user.room][lobbyUsers[0]].write('{"action":"gameinit","id":"' + lobbyUsers[0] + '","room":"' + user.room + '"}\n');
 				users[user.room][lobbyUsers[1]].write('{"action":"gameinit","id":"' + lobbyUsers[1] + '","room":"' + user.room + '"}\n');
 
@@ -38,12 +38,22 @@ server.on('connection', function(user){
 		};
 		if (message.action == 'HIT') {
 			console.log("HIT");
+			var hit = message.hit;
 			var gameUsers = Object.keys(users[message.room])
 			for (var i = 0; i < gameUsers.length; i++) {
-				users[message.room][gameUsers[i]].write(dataRaw.toString() + "\n");
+				if (user.connectionId == gameUsers[i]) {
+					users[message.room][gameUsers[i]].life = users[message.room][gameUsers[i]].life + hit;
+				}else{
+					users[message.room][gameUsers[i]].life = users[message.room][gameUsers[i]].life - hit;
+				}
+
+				message['life'] = users[message.room][gameUsers[i]].life;
+
+				console.log("LIFES",message.id, message.life);
+
+				users[message.room][gameUsers[i]].write(JSON.stringify(message) + "\n");
 			};
 		};
-		console.log(message);
 	})//end of user.on('data')
 	user.on('error', function () { return _destroySocket(user) })
 	user.on('close', function () { return _destroySocket(user) })
